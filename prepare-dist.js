@@ -3,6 +3,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname);
 const DIST = path.join(ROOT, 'dist');
+const WP_ORG = path.join(ROOT, '.wordpress-org');
 
 // Clean dist
 if (fs.existsSync(DIST)) {
@@ -35,6 +36,19 @@ for (const dir of dirsToCopy) {
   if (fs.existsSync(src)) {
     copyDirSync(src, path.join(DIST, dir));
     console.log('Copied dir:', dir);
+  }
+}
+
+// Copy WordPress.org assets from .wordpress-org/ to dist root
+if (fs.existsSync(WP_ORG) && fs.statSync(WP_ORG).isDirectory()) {
+  const entries = fs.readdirSync(WP_ORG, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(WP_ORG, entry.name);
+    const destPath = path.join(DIST, entry.name);
+    if (entry.isFile()) {
+      fs.copyFileSync(srcPath, destPath);
+      console.log('Copied asset:', entry.name);
+    }
   }
 }
 
