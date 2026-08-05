@@ -23,10 +23,13 @@ const dirsToCopy = [
   'pdf-js',
 ];
 
+const copiedFiles = new Set();
+
 for (const file of filesToCopy) {
   const src = path.join(ROOT, file);
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, path.join(DIST, file));
+    copiedFiles.add(file);
     console.log('Copied:', file);
   }
 }
@@ -35,6 +38,7 @@ for (const dir of dirsToCopy) {
   const src = path.join(ROOT, dir);
   if (fs.existsSync(src)) {
     copyDirSync(src, path.join(DIST, dir));
+    copiedFiles.add(dir);
     console.log('Copied dir:', dir);
   }
 }
@@ -47,11 +51,22 @@ if (fs.existsSync(WP_ORG) && fs.statSync(WP_ORG).isDirectory()) {
     const destPath = path.join(DIST, entry.name);
     if (entry.isFile()) {
       fs.copyFileSync(srcPath, destPath);
+      copiedFiles.add(entry.name);
       console.log('Copied asset:', entry.name);
     }
   }
 }
 
+// Write .distignore inside dist/ so deploy only includes copied files
+const distignore = ['*'];
+for (const f of copiedFiles) {
+  if (f.endsWith('/')) {
+    distignore.push('!' + f);
+  } else {
+    distignore.push('!' + f);
+  }
+}
+fs.writeFileSync(path.join(DIST, '.distignore'), distignore.join('\n') + '\n');
 console.log('dist/ ready for deployment.');
 
 function copyDirSync(src, dest) {
