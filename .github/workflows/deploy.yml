@@ -10,9 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: 10up/action-wordpress-plugin-deploy@stable
+      - uses: 10up/action-wordpress-plugin-deploy@v1
         with:
-          build_dir: dist
+          plugin_path: dist
           assets_dir: .wordpress-org
           svn_password: ${{ secrets.SVN_PASSWORD }}
           svn_username: ${{ secrets.SVN_USERNAME }}
