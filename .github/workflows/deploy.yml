@@ -12,6 +12,7 @@ jobs:
 
       - uses: 10up/action-wordpress-plugin-deploy@stable
         with:
-          plugin_path: dist
+          build_dir: dist
+          assets_dir: .wordpress-org
           svn_password: ${{ secrets.SVN_PASSWORD }}
           svn_username: ${{ secrets.SVN_USERNAME }}
