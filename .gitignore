@@ -37,3 +37,6 @@ dist/
 
 # Old SVN trunk
 master-pdf-viewer/
+
+# WordPress.org trunk directory
+.wordpress-org/
