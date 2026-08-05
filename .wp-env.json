@@ -1,0 +1,11 @@
+{
+  "core": "C:/xampp/htdocs/wordpress_5_9",
+  "plugins": [
+    "."
+  ],
+  "env": {
+    "development": {
+      "port": 8888
+    }
+  }
+}

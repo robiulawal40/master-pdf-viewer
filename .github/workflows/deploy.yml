@@ -1,0 +1,25 @@
+name: Deploy to WordPress.org
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run dist
+
+      - uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          plugin_path: dist
+          svn_password: ${{ secrets.SVN_PASSWORD }}
+          svn_username: ${{ secrets.SVN_USERNAME }}

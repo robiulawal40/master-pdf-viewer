@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "pdf-viewer/mpv-pdf-viewer",
+  "version": "0.1.0",
+  "title": "Master PDF Viewer",
+  "category": "media",
+  "icon": "pdf",
+  "description": "Example block scaffolded with Create Block tool.",
+  "supports": {
+    "html": false
+  },
+  "attributes": {
+    "id": {
+      "type": "integer",
+      "default": 0
+    },
+    "file": {
+      "type": "string",
+      "default": ""
+    },
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "externalUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "download": {
+      "type": "boolean",
+      "default": false
+    },
+    "print": {
+      "type": "boolean",
+      "default": false
+    },
+    "search": {
+      "type": "boolean",
+      "default": false
+    },
+    "sidebar": {
+      "type": "boolean",
+      "default": false
+    },
+    "presentationMode": {
+      "type": "boolean",
+      "default": false
+    },
+    "openFile": {
+      "type": "boolean",
+      "default": false
+    },
+    "editButton": {
+      "type": "boolean",
+      "default": false
+    },
+    "cursorHandTool": {
+      "type": "boolean",
+      "default": false
+    },
+    "documentProperties": {
+      "type": "boolean",
+      "default": false
+    },
+    "themeColor": {
+      "type": "string",
+      "default": "#333"
+    },
+    "width": {
+      "type": "string",
+      "default": "100%"
+    },
+    "height": {
+      "type": "string",
+      "default": "400"
+    },
+    "zoomLevel": {
+      "type": "string",
+      "default": "page-actual"
+    },
+    "defaultLandingPage": {
+      "type": "string",
+      "default": "1"
+    },
+    "pageViewMode": {
+      "type": "string",
+      "default": "default"
+    }
+  },
+  "textdomain": "mpv",
+  "editorScript": "file:./index.js",
+  "script": "pdf-js-lib",
+  "viewScript": "",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master PDF Viewer</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f5f6fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #1a1a2e;
+    }
+
+    .viewer-container {
+      width: 100%;
+      max-width: 900px;
+      min-height: 600px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .viewer-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-bottom: 1px solid #e8e8f0;
+      flex-shrink: 0;
+    }
+
+    .viewer-toolbar .doc-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .viewer-toolbar .doc-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #2c3e50;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .viewer-toolbar .doc-meta {
+      font-size: 12px;
+      color: #95a5a6;
+      flex-shrink: 0;
+    }
+
+    .viewer-canvas-wrapper {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #fafbfc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fafbfc;
+      z-index: 10;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .spinner-ring {
+      position: relative;
+      width: 56px;
+      height: 56px;
+    }
+
+    .spinner-ring svg {
+      width: 100%;
+      height: 100%;
+      animation: spin 1.2s linear infinite;
+    }
+
+    .spinner-ring .track {
+      fill: none;
+      stroke: #e8e8f0;
+      stroke-width: 4;
+    }
+
+    .spinner-ring .progress {
+      fill: none;
+      stroke: url(#spinnerGradient);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 157;
+      stroke-dashoffset: 157;
+      animation: spin-progress 2s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spin-progress {
+      0% { stroke-dashoffset: 157; }
+      50% { stroke-dashoffset: 40; }
+      100% { stroke-dashoffset: 157; }
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #6c7a89;
+      font-weight: 400;
+    }
+
+    .loading-text span {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .progress-bar-container {
+      width: 200px;
+      height: 4px;
+      background: #e8e8f0;
+      border-radius: 2px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e74c3c, #e67e22);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      animation: progress-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes progress-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .pdf-icon-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      width: 64px;
+      height: 64px;
+      opacity: 0.08;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .viewer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: #ffffff;
+      border-top: 1px solid #e8e8f0;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: #95a5a6;
+    }
+
+    .viewer-footer .page-info {
+      font-weight: 500;
+      color: #6c7a89;
+    }
+
+    .viewer-footer .zoom-info {
+      color: #95a5a6;
+    }
+
+    .error-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      position: absolute;
+      inset: 0;
+      background: #fafbfc;
+      z-index: 20;
+    }
+
+    .error-state.visible {
+      display: flex;
+    }
+
+    .error-state .error-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      color: #e74c3c;
+    }
+
+    .error-state .error-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+
+    .error-state .error-message {
+      font-size: 13px;
+      color: #95a5a6;
+      max-width: 300px;
+    }
+
+    .retry-btn {
+      margin-top: 16px;
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .retry-btn:hover {
+      opacity: 0.9;
+    }
+
+    .pdf-page {
+      display: block;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 2px;
+    }
+
+    .page-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px;
+      background: #ffffff;
+      border-top: 1px solid #e8e8f0;
+      flex-shrink: 0;
+    }
+
+    .page-nav button {
+      padding: 6px 14px;
+      background: #f5f6fa;
+      border: 1px solid #e8e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .page-nav button:hover {
+      background: #e8e8f0;
+    }
+
+    .page-nav button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .page-nav .page-num {
+      font-size: 13px;
+      font-weight: 500;
+      color: #6c7a89;
+    }
+  </style>
+</head>
+<body>
+  <div class="viewer-container">
+    <div class="viewer-toolbar">
+      <div class="doc-icon">PDF</div>
+      <div class="doc-name" id="docName">sample.pdf</div>
+      <div class="doc-meta" id="docMeta"></div>
+    </div>
+
+    <div class="viewer-canvas-wrapper" id="viewerWrapper">
+      <svg class="pdf-icon-watermark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" fill="currentColor"/>
+        <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="16" y1="9" x2="8" y2="9" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-ring">
+          <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#e74c3c"/>
+                <stop offset="100%" stop-color="#e67e22"/>
+              </linearGradient>
+            </defs>
+            <circle class="track" cx="28" cy="28" r="25"/>
+            <circle class="progress" cx="28" cy="28" r="25"/>
+          </svg>
+        </div>
+        <div class="loading-text">Loading <span>PDF</span>…</div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="error-state" id="errorState">
+        <svg class="error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="12" y1="8" x2="12" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="12" cy="16.5" r="1" fill="currentColor"/>
+        </svg>
+        <div class="error-title">Failed to load PDF</div>
+        <div class="error-message" id="errorMessage">The file could not be loaded. Please check your connection and try again.</div>
+        <button class="retry-btn" id="retryBtn">Retry</button>
+      </div>
+
+      <div id="pdfPages"></div>
+    </div>
+
+    <div class="page-nav" id="pageNav" style="display: none;">
+      <button id="prevBtn" disabled>Previous</button>
+      <span class="page-num" id="pageNumDisplay">Page 1</span>
+      <button id="nextBtn">Next</button>
+    </div>
+
+    <div class="viewer-footer">
+      <div class="page-info" id="pageInfo">Page 1 of 1</div>
+      <div class="zoom-info" id="zoomInfo">100%</div>
+    </div>
+  </div>
+
+  <script src="pdf-js/build/pdf.js"></script>
+  <script>
+    (function () {
+      var loadingOverlay = document.getElementById('loadingOverlay');
+      var errorState = document.getElementById('errorState');
+      var progressBar = document.getElementById('progressBar');
+      var retryBtn = document.getElementById('retryBtn');
+      var pageInfo = document.getElementById('pageInfo');
+      var zoomInfo = document.getElementById('zoomInfo');
+      var pdfPages = document.getElementById('pdfPages');
+      var pageNav = document.getElementById('pageNav');
+      var prevBtn = document.getElementById('prevBtn');
+      var nextBtn = document.getElementById('nextBtn');
+      var pageNumDisplay = document.getElementById('pageNumDisplay');
+      var docMeta = document.getElementById('docMeta');
+      var docName = document.getElementById('docName');
+      var errorMessage = document.getElementById('errorMessage');
+      var wrapper = document.getElementById('viewerWrapper');
+
+      var pdfDoc = null;
+      var currentPage = 1;
+      var totalPages = 0;
+
+      pdfjsLib.workerSrc = 'pdf-js/build/pdf.worker.js';
+
+      function showLoading() {
+        loadingOverlay.classList.remove('hidden');
+        errorState.classList.remove('visible');
+        pdfPages.innerHTML = '';
+        pageNav.style.display = 'none';
+      }
+
+      function hideLoading() {
+        loadingOverlay.classList.add('hidden');
+      }
+
+      function showError(msg) {
+        hideLoading();
+        if (msg) {
+          errorMessage.textContent = msg;
+        }
+        errorState.classList.add('visible');
+      }
+
+      function getFitScale(pageWidth, pageHeight) {
+        var padding = 20;
+        var maxW = wrapper.clientWidth - padding;
+        var maxH = wrapper.clientHeight - padding;
+        var scaleX = maxW / pageWidth;
+        var scaleY = maxH / pageHeight;
+        return Math.min(scaleX, scaleY, 2);
+      }
+
+      function renderPage(pageNum) {
+        pdfDoc.getPage(pageNum).then(function (page) {
+          var viewport = page.getViewport({ scale: 1 });
+          var fitScale = getFitScale(viewport.width, viewport.height);
+          var scaledViewport = page.getViewport({ scale: fitScale });
+
+          var canvas = document.createElement('canvas');
+          canvas.className = 'pdf-page';
+          canvas.width = scaledViewport.width;
+          canvas.height = scaledViewport.height;
+          canvas.id = 'page-' + pageNum;
+
+          var context = canvas.getContext('2d');
+          var renderContext = {
+            canvasContext: context,
+            viewport: scaledViewport
+          };
+
+          page.render(renderContext).promise.then(function () {
+            pdfPages.innerHTML = '';
+            pdfPages.appendChild(canvas);
+            zoomInfo.textContent = Math.round(fitScale * 100) + '%';
+            pageNav.style.display = 'flex';
+            updatePageNav(pageNum);
+          }).catch(function (err) {
+            console.error('Error rendering page', pageNum, err);
+          });
+        });
+      }
+
+      function updatePageNav(pageNum) {
+        pageNumDisplay.textContent = 'Page ' + pageNum;
+        prevBtn.disabled = pageNum <= 1;
+        nextBtn.disabled = pageNum >= totalPages;
+        pageInfo.textContent = 'Page ' + pageNum + ' of ' + totalPages;
+      }
+
+      function clearPages() {
+        pdfPages.innerHTML = '';
+      }
+
+      function loadPDF(url) {
+        showLoading();
+        progressBar.style.width = '0%';
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onprogress = function (e) {
+          if (e.lengthComputable) {
+            var pct = (e.loaded / e.total) * 100;
+            progressBar.style.width = pct + '%';
+          }
+        };
+
+        xhr.onload = function () {
+          if (xhr.status === 200 || xhr.status === 0) {
+            var typedArray = new Uint8Array(xhr.response);
+            pdfjsLib.getDocument(typedArray).promise.then(function (pdf) {
+              pdfDoc = pdf;
+              totalPages = pdf.numPages;
+              docMeta.textContent = totalPages + ' pages';
+              clearPages();
+              currentPage = 1;
+              renderPage(currentPage);
+              hideLoading();
+              updatePageNav(currentPage);
+            }).catch(function (err) {
+              console.error('Error loading PDF:', err);
+              showError('Failed to parse PDF file. The file may be corrupted.');
+            });
+          } else {
+            showError('Failed to fetch PDF (HTTP ' + xhr.status + ').');
+          }
+        };
+
+        xhr.onerror = function () {
+          showError('Network error. Please check your connection.');
+        };
+
+        xhr.send();
+      }
+
+      prevBtn.addEventListener('click', function () {
+        if (currentPage > 1) {
+          currentPage--;
+          clearPages();
+          renderPage(currentPage);
+          updatePageNav(currentPage);
+        }
+      });
+
+      nextBtn.addEventListener('click', function () {
+        if (currentPage < totalPages) {
+          currentPage++;
+          clearPages();
+          renderPage(currentPage);
+          updatePageNav(currentPage);
+        }
+      });
+
+      retryBtn.addEventListener('click', function () {
+        loadPDF('sample.pdf');
+      });
+
+      loadPDF('sample.pdf');
+    })();
+  </script>
+</body>
+</html>

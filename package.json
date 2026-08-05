@@ -1,0 +1,33 @@
+{
+	"name": "master-pdf-viewer",
+	"version": "0.0.2",
+	"description": "PDF Viewer ",
+	"author": "Robiul, Fuad",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build --webpack-copy-php",
+		"dist": "npm run build && node prepare-dist.js",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start --webpack-copy-php",
+		"wp": "cmd /c start /B C:/xampp/apache_start.bat & start /B C:/xampp/mysql_start.bat & timeout /t 3 /nobreak >nul & start \"\" \"http://localhost/wp-admin/post.php?post=6&action=edit\" & start /B npm run start & node watch-reload.js"
+	},
+	"files": [
+		"pdf-js",
+		"functions.php",
+		"master-pdf-viewer.php",
+		"build"
+	],
+	"devDependencies": {
+		"@wordpress/scripts": "^25.0.0"
+	},
+	"dependencies": {
+		"@wordpress/icons": "^15.3.0",
+		"ajv": "^7.2.4",
+		"sass-loader": "^17.0.0"
+	}
+}
