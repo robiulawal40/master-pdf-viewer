@@ -1,0 +1,17 @@
+{
+  "name": "Master PDF Viewer",
+  "slug": "master-pdf-viewer",
+  "homepage": "https://wordpress.org/plugins/master-pdf-viewer/",
+  "download_url": "https://github.com/robiulawal40/master-pdf-viewer/archive/refs/tags/%s.zip",
+  "version": "0.0.2",
+  "description": "Immediately embed PDF into the posts and pages on your website. Your PDF files will automatically resize to their proper dimensions.",
+  "author": "Robiul, Fuad",
+  "author_profile": "https://profiles.wordpress.org/robiulawal40/",
+  "requires": "5.0",
+  "tested": "7.0",
+  "requires_php": "6.0",
+  "license": "GPL-2.0-or-later",
+  "license_uri": "https://www.gnu.org/licenses/gpl-2.0.html",
+  "text_domain": "master-pdf-viewer",
+  "domain_path": "/languages"
+}
