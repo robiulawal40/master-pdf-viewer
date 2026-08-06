@@ -57,8 +57,10 @@ export default function Edit({ attributes, setAttributes, isSelected, setSelecte
 	} = attributes;
 
 const onUpdateMedia = ({ id, url, title  })=>{
-	setAttributes( { id, file:url, title  } );
-	// console.log("after media update: attributes", attributes);
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+    setAttributes( { id, file: path, title  } );
+    // console.log("after media update: attributes", attributes);
 }
 
 function updateAttribute(key) {
@@ -220,17 +222,12 @@ return (
 		{
 			! isSelected && <div style={{display:"block", position:"absolute", width:"100%", height:"100%", background:"transparent", top:"0px", zIndex:"100"}}></div>
 		}
-		{ isSelected &&	<MediaPlaceholder
+		{ isSelected &&				<MediaPlaceholder
 				labels={{
 					title: __('Master PDF Viewer updated', 'mpv'),
 					instructions: __('Drag a PDF, upload a new one or select a PDF from your library.', 'mpv'),
 				}}
 				onSelect={onUpdateMedia}
-				onSelectURL={
-					updateAttribute("file")
-				}
-				// notices={props.noticeUI}
-				// onError={props.noticeOperations.createErrorNotice}
 				accept='application/pdf'
 				allowedTypes={['application/pdf']}
 			/>

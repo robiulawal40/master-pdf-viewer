@@ -29,7 +29,15 @@ function mpv_process_attributes( $attributes ) {
 
 function mpv_pdf_viewer_block( $attributes ) {
 
-	$settings = build_query( $attributes );
+	$attrs = $attributes;
+
+	if ( isset( $attrs['file'] ) && ! empty( $attrs['file'] ) ) {
+		if ( strpos( $attrs['file'], 'http' ) !== 0 ) {
+			$attrs['file'] = site_url( $attrs['file'] );
+		}
+	}
+
+	$settings = build_query( $attrs );
 
 	$result = '<div class="mpv_pdf_wrapper" ' . esc_html( mpv_process_attributes( $attributes )) . ' >';
 
