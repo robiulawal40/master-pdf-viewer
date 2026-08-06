@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: 10up/action-wordpress-plugin-deploy@stable
+      - uses: 10up/action-wordpress-plugin-deploy@ec0098272fa5aa165a7a7cfe1502ae6b3b266f57
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
