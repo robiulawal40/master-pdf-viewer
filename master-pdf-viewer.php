@@ -4,7 +4,7 @@
  * Description:       Immediately embed PDF into the posts and pages on your website. Your PDF files will automatically resize to their proper dimensions.
  * Requires at least: 5.0
  * Requires PHP:      6.0
- * Version:           0.0.2
+ * Version:           0.0.3
  * Author:            robiulawal40, fuad40
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
