@@ -2,7 +2,7 @@
 Contributors:      Robiul, Fuad
 Tags:              block
 Tested up to:      7.0
-Stable tag:        0.0.2
+Stable tag:        0.0.3
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,5 +73,14 @@ Yes - it is relatively easy to find the link to download the file directly.
 
 == Changelog ==
 
+= 0.0.3 =
+* Save only file path in block attributes for portable storage
+* Maintain backward compatibility with existing blocks
+* Remove external URL input from media placeholder
+* Add auto-reload development workflow
+* Add RELEASE.md and DEV.md documentation
+* Update WordPress tested version to 7.0
+
 = 0.0.2 =
 * Release
+
