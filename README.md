@@ -46,27 +46,27 @@ The plugin uses only JavaScript and serves all files from your own server, givin
 
 ## Block Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `id` | integer | 0 | Attachment ID of the PDF |
-| `file` | string | `""` | URL of the PDF file |
-| `title` | string | `""` | Title of the PDF |
-| `externalUrl` | string | `""` | External URL to a PDF |
-| `download` | boolean | `false` | Show download button |
-| `print` | boolean | `false` | Show print button |
-| `search` | boolean | `false` | Show search bar |
-| `sidebar` | boolean | `false` | Show sidebar |
-| `presentationMode` | boolean | `false` | Enable presentation mode |
-| `openFile` | boolean | `false` | Show open file button |
-| `editButton` | boolean | `false` | Show edit button |
-| `cursorHandTool` | boolean | `false` | Default to hand cursor tool |
-| `documentProperties` | boolean | `false` | Show document properties button |
-| `themeColor` | string | `#333` | Viewer theme color |
-| `width` | string | `100%` | Width of the viewer |
-| `height` | string | `400` | Height of the viewer |
-| `zoomLevel` | string | `page-actual` | Default zoom level |
-| `defaultLandingPage` | string | `1` | Default page to open |
-| `pageViewMode` | string | `default` | Page scrolling mode |
+| Attribute            | Type    | Default       | Description                     |
+| -------------------- | ------- | ------------- | ------------------------------- |
+| `id`                 | integer | 0             | Attachment ID of the PDF        |
+| `file`               | string  | `""`          | URL of the PDF file             |
+| `title`              | string  | `""`          | Title of the PDF                |
+| `externalUrl`        | string  | `""`          | External URL to a PDF           |
+| `download`           | boolean | `false`       | Show download button            |
+| `print`              | boolean | `false`       | Show print button               |
+| `search`             | boolean | `false`       | Show search bar                 |
+| `sidebar`            | boolean | `false`       | Show sidebar                    |
+| `presentationMode`   | boolean | `false`       | Enable presentation mode        |
+| `openFile`           | boolean | `false`       | Show open file button           |
+| `editButton`         | boolean | `false`       | Show edit button                |
+| `cursorHandTool`     | boolean | `false`       | Default to hand cursor tool     |
+| `documentProperties` | boolean | `false`       | Show document properties button |
+| `themeColor`         | string  | `#333`        | Viewer theme color              |
+| `width`              | string  | `100%`        | Width of the viewer             |
+| `height`             | string  | `400`         | Height of the viewer            |
+| `zoomLevel`          | string  | `page-actual` | Default zoom level              |
+| `defaultLandingPage` | string  | `1`           | Default page to open            |
+| `pageViewMode`       | string  | `default`     | Page scrolling mode             |
 
 ## Settings
 
@@ -85,9 +85,17 @@ Go to **Settings -> Master PDF Viewer** in the WordPress admin to change site-wi
 
 ## Changelog
 
+### 0.0.3
+
+- Save only file path in block attributes for portable storage
+- Maintain backward compatibility with existing blocks
+- Remove external URL input from media placeholder
+- Add auto-reload development workflow
+- Update WordPress tested version to 7.0
+
 ### 0.1.0
 
-* Initial release
+- Initial release
 
 ## License
 
