@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
@@ -17,20 +17,9 @@ jobs:
 
       - run: npm ci
 
-      - name: Install SVN
-        run: sudo apt-get install -y subversion
-
-      - name: Checkout WordPress.org SVN
-        run: |
-          svn checkout https://plugins.svn.wordpress.org/master-pdf-viewer/ wp-svn
-
-      - name: Copy plugin files to trunk
-        run: |
-          cp -r dist/* wp-svn/trunk/
-          cp -r .wordpress-org/* wp-svn/assets/
-
-      - name: Commit to SVN
-        run: |
-          cd wp-svn
-          svn add --force trunk/* assets/*
-          svn commit -m "Release ${{ github.event.release.tag_name }}" --username ${{ secrets.SVN_USERNAME }} --password ${{ secrets.SVN_PASSWORD }} --non-interactive
+      - uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          BUILD_DIR: dist
+          ASSETS_DIR: .wordpress-org
