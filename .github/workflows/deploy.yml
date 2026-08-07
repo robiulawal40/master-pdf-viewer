@@ -17,10 +17,20 @@ jobs:
 
       - run: npm ci
 
-      - uses: 10up/action-wordpress-plugin-deploy@v1
-        with:
-          plugin_path: dist
-          assets_dir: .wordpress-org
-        env:
-          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+      - name: Install SVN
+        run: sudo apt-get install -y subversion
+
+      - name: Checkout WordPress.org SVN
+        run: |
+          svn checkout https://plugins.svn.wordpress.org/master-pdf-viewer/ wp-svn
+
+      - name: Copy plugin files to trunk
+        run: |
+          cp -r dist/* wp-svn/trunk/
+          cp -r .wordpress-org/* wp-svn/assets/
+
+      - name: Commit to SVN
+        run: |
+          cd wp-svn
+          svn add --force trunk/* assets/*
+          svn commit -m "Release ${{ github.event.release.tag_name }}" --username ${{ secrets.SVN_USERNAME }} --password ${{ secrets.SVN_PASSWORD }} --non-interactive
