@@ -9,13 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
         with:
-          node-version: '24'
-          cache: npm
-
-      - run: npm ci
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Install Subversion (SVN)
         run: sudo apt-get update && sudo apt-get install -y subversion
@@ -26,3 +22,4 @@ jobs:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           BUILD_DIR: dist
           ASSETS_DIR: .wordpress-org
+          VERSION: ${{ github.event.release.tag_name }}
