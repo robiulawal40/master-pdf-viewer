@@ -78,8 +78,9 @@ The workflow (`.github/workflows/deploy.yml`) triggers on release publish and:
 
 1. Checks out the repository
 2. Uses `10up/action-wordpress-plugin-deploy@stable` with:
-   - `plugin_path: dist` — deploys built files to SVN trunk
-   - `assets_dir: .wordpress-org` — deploys banner, icons, screenshots
+   - `BUILD_DIR: dist` — deploys built files to SVN trunk
+   - `ASSETS_DIR: .wordpress-org` — deploys banner, icons, screenshots
+   - `VERSION: ${{ github.event.release.tag_name }}` — sets the plugin version
    - SVN credentials from secrets
 
 ```yaml
@@ -93,20 +94,24 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-      - uses: 10up/action-wordpress-plugin-deploy@stable
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@stable
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           BUILD_DIR: dist
           ASSETS_DIR: .wordpress-org
+          VERSION: ${{ github.event.release.tag_name }}
 ```
 
 ## How It Works
 
-- `build_dir` / `BUILD_DIR` — directory containing built plugin files. All files in this directory are deployed to the WordPress.org SVN trunk. `.distignore` or `.gitattributes` are ignored when using `build_dir`.
-- `assets_dir` / `ASSETS_DIR` — directory containing WordPress.org plugin assets (banner, icons, screenshots). These are automatically moved to the `assets/` directory in SVN.
+- `BUILD_DIR` — directory containing built plugin files. All files in this directory are deployed to the WordPress.org SVN trunk. `.distignore` or `.gitattributes` are ignored when using `BUILD_DIR`.
+- `ASSETS_DIR` — directory containing WordPress.org plugin assets (banner, icons, screenshots). These are automatically moved to the `assets/` directory in SVN.
+- `VERSION` — defaults to the Git tag name. Explicitly set to the release tag for consistency.
 - The action commits the Git tag contents to the WordPress.org SVN repository using the same tag name.
 
 ## Post-Deployment
@@ -135,3 +140,5 @@ jobs:
   ```
 - **Workflow fails**: Check GitHub Actions logs for specific errors
 - **SVN auth fails**: Verify `SVN_USERNAME` and `SVN_PASSWORD` secrets are correct
+- **npm ci fails**: Use `npm install` instead of `npm ci` if lockfile is out of sync
+- **Node.js deprecation warning**: Use `actions/setup-node@v5` with `node-version: '24'` and `actions/checkout@v5`
