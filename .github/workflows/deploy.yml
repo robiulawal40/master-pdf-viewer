@@ -8,19 +8,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
-          cache: npm
-
-      - run: npm install
-
-      - name: Install Subversion (SVN)
-        run: sudo apt-get update && sudo apt-get install -y subversion
-
-      - uses: 10up/action-wordpress-plugin-deploy@stable
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@stable
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
